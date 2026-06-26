@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: innovatech-frontend
+  namespace: user2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: innovatech-frontend
+  template:
+    metadata:
+      labels:
+        app: innovatech-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: localhost:5000/innovatech-frontend:eks-v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4173
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
