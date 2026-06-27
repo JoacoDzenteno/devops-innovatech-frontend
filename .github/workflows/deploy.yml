@@ -1,4 +1,4 @@
-name: CI/CD Frontend
+name: CI/CD Innovatech Frontend
 
 on:
   push:
@@ -24,16 +24,17 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/innovatech-front-despacho:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/innovatech-frontend:eks-v1
 
-      - name: Deploy en servidor
+      - name: Deploy en servidor K3s
         uses: appleboy/ssh-action@v1
         with:
-          host: elservidor.redirectme.net
-          username: user1
-          password: usuario1
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            docker stop frontend_despacho || true
-            docker rm frontend_despacho || true
-            docker pull ${{ secrets.DOCKER_USERNAME }}/innovatech-front-despacho:latest
-            docker run -d -p 4173:4173 --name frontend_despacho ${{ secrets.DOCKER_USERNAME }}/innovatech-front-despacho:latest
+            podman pull ${{ secrets.DOCKER_USERNAME }}/innovatech-frontend:eks-v1
+            podman tag ${{ secrets.DOCKER_USERNAME }}/innovatech-frontend:eks-v1 localhost:5000/innovatech-frontend:eks-v1
+            podman push --tls-verify=false localhost:5000/innovatech-frontend:eks-v1
+            kubectl rollout restart deployment/innovatech-frontend -n user2
+            kubectl rollout status deployment/innovatech-frontend -n user2
